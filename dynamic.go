@@ -22,6 +22,8 @@ type DynamicGraph[vertex Beforer[vertex], edge E, length L] interface {
 }
 
 // ShortestPathDyn returns the shortest path from start to a vertex >= end.
+// ErrNoPath is returned if there is no path from start to a vertex >= end.
+// Otherwise, the path is returned as a slice of edges.
 func ShortestPathDyn[vertex Beforer[vertex], edge E, length L](g DynamicGraph[vertex, edge, length], start, end vertex) ([]edge, error) {
 	if end.Before(start) {
 		return nil, ErrNoPath
