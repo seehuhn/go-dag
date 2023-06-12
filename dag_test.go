@@ -115,3 +115,33 @@ func BenchmarkDoubleEdges(b *testing.B) {
 		ShortestPath[bool, int](g, 100)
 	}
 }
+
+func TestUnreached(t *testing.T) {
+	// verify that ShortestPath does not attempt to start edges
+	// at unreachable vertices.
+	g := jumpGraph(100)
+	ee, err := ShortestPath[int, int](g, 100)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ee) != 1 || ee[0] != 100 {
+		t.Errorf("expected 1 edge, got %v", ee)
+	}
+}
+
+type jumpGraph int
+
+func (g jumpGraph) AppendEdges(ee []int, v int) []int {
+	return append(ee, int(g))
+}
+
+func (g jumpGraph) Length(v int, e int) int {
+	return 1
+}
+
+func (g jumpGraph) To(v int, e int) int {
+	if v != 0 {
+		panic("test failed")
+	}
+	return e
+}

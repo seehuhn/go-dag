@@ -58,8 +58,12 @@ func ShortestPath[edge E, length L](g Graph[edge, length], n int) ([]edge, error
 		reached  bool
 	}
 	info := make([]vertexInfo, n+1)
+	info[0].reached = true
 	var ee []edge
 	for v := 0; v < n; v++ {
+		if !info[v].reached {
+			continue
+		}
 		ee = g.AppendEdges(ee[:0], v)
 		for _, e := range ee {
 			w := g.To(v, e)
