@@ -1,3 +1,19 @@
+// seehuhn.de/go/dag - compute shortest paths in directed acyclic graphs
+// Copyright (C) 2025  Jochen Voss <voss@seehuhn.de>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 package dag
 
 import (
@@ -8,7 +24,7 @@ type Beforer[T any] interface {
 	Before(T) bool
 }
 
-// Graph represents a directed acyclic graph.
+// DynamicGraph represents a directed acyclic graph with ordered vertices.
 type DynamicGraph[vertex Beforer[vertex], edge E, length L] interface {
 	// AppendEdges appends the outgoing edges of the given vertex to a slice.
 	// All edges must lead to vertices with index strictly greater than v.
@@ -21,9 +37,8 @@ type DynamicGraph[vertex Beforer[vertex], edge E, length L] interface {
 	To(v vertex, e edge) vertex
 }
 
-// ShortestPathDyn returns the shortest path from start to a vertex >= end.
-// ErrNoPath is returned if there is no path from start to a vertex >= end.
-// Otherwise, the path is returned as a slice of edges.
+// ShortestPathDyn returns the shortest path from start to a vertex >= end, as
+// a slice of edges. ErrNoPath is returned if there is no such path.
 func ShortestPathDyn[vertex Beforer[vertex], edge E, length L](g DynamicGraph[vertex, edge, length], start, end vertex) ([]edge, error) {
 	if end.Before(start) {
 		return nil, ErrNoPath
@@ -45,6 +60,7 @@ func ShortestPathDyn[vertex Beforer[vertex], edge E, length L](g DynamicGraph[ve
 	var bestLength length
 	for len(info) > 0 && info[0].v.Before(end) {
 		current := info[0]
+		// TODO(voss): consider using container/heap here
 		copy(info, info[1:])
 		info = info[:len(info)-1]
 

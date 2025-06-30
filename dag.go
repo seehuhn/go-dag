@@ -28,7 +28,7 @@ type L interface {
 		~float32 | ~float64
 }
 
-// Graph represents a directed acyclic graph.
+// Graph represents a directed acyclic graph with integer vertices 0, 1, 2, ...
 type Graph[edge E, length L] interface {
 	// AppendEdges appends the outgoing edges of the given vertex to a slice.
 	// All edges must lead to vertices with index strictly greater than v.
@@ -42,7 +42,7 @@ type Graph[edge E, length L] interface {
 }
 
 // ShortestPath returns the shortest path from 0 to n.
-// ErrNoPath is returned if there is no path from start to a vertex >= end.
+// ErrNoPath is returned if there is no path from 0 to n.
 // Otherwise, the path is returned as a slice of edges.
 func ShortestPath[edge E, length L](g Graph[edge, length], n int) ([]edge, error) {
 	if n == 0 {
