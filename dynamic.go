@@ -20,6 +20,12 @@ import (
 	"sort"
 )
 
+// Beforer is implemented by ordered vertex types.
+//
+// Before must implement a strict total order: it must be irreflexive and
+// transitive, and any two vertices which are not the same vertex must be
+// ordered. That is, if neither v.Before(u) nor u.Before(v) holds, then v and u
+// must be the same vertex.
 type Beforer[T any] interface {
 	Before(T) bool
 }
@@ -27,7 +33,7 @@ type Beforer[T any] interface {
 // DynamicGraph represents a directed acyclic graph with ordered vertices.
 type DynamicGraph[vertex Beforer[vertex], edge E, length L] interface {
 	// AppendEdges appends the outgoing edges of the given vertex to a slice.
-	// All edges must lead to vertices with index strictly greater than v.
+	// All edges must lead to vertices strictly after v in the vertex order.
 	AppendEdges(ee []edge, v vertex) []edge
 
 	// Length returns the length of edge e starting at vertex v.
@@ -38,7 +44,11 @@ type DynamicGraph[vertex Beforer[vertex], edge E, length L] interface {
 }
 
 // ShortestPathDyn returns the shortest path from start to a vertex >= end, as
-// a slice of edges. ErrNoPath is returned if there is no such path.
+// a slice of edges. ErrNoPath is returned if there is no such path, or if end
+// is before start.
+//
+// All edge lengths must be non-negative. The sum of the edge lengths along any
+// path must be representable in length.
 func ShortestPathDyn[vertex Beforer[vertex], edge E, length L](g DynamicGraph[vertex, edge, length], start, end vertex) ([]edge, error) {
 	if end.Before(start) {
 		return nil, ErrNoPath

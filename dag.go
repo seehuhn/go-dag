@@ -44,6 +44,9 @@ type Graph[edge E, length L] interface {
 // ShortestPath returns the shortest path from 0 to n.
 // ErrNoPath is returned if there is no path from 0 to n.
 // Otherwise, the path is returned as a slice of edges.
+//
+// Edge lengths may be negative. The sum of the edge lengths along any path
+// must be representable in length.
 func ShortestPath[edge E, length L](g Graph[edge, length], n int) ([]edge, error) {
 	if n == 0 {
 		return nil, nil
